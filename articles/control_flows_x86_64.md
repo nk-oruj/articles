@@ -379,15 +379,15 @@ L2:
 ## Abstraction
 
 - abstraction of the restructured pseudo-code
-	- `with [name] ... end;` is equivalent to pseudo-code `L1: ... L2:`, `L3: ... L4:`, etc. (scoping label pairs)
+	- `for [name] ... end;` is equivalent to pseudo-code `L1: ... L2:`, `L3: ... L4:`, etc. (scoping label pairs)
 	- `drop [name];`, `drop [name] if [condition];` is equivalent to pseudo-code `goto L2;`, `goto L2 if [condition];` (the lower label of the scope)
 	- `lift [name];`, `lift [name] if [condition]` is equivalent to pseudo-code `goto L1;`, `goto L1 if [condition];` (the higher label of the scope)
 	- `drop` and `lift` statements access only those scopes/names, inside of which they are called, and can access no other scope, not even the parallel ones
 ### If Statement
 
 ```pascal
-	with Case
-		drop Case if not y;
+	for branch
+		drop branch if not y;
 		...
 	end;
 ```
@@ -395,83 +395,87 @@ L2:
 ### If...Else Statement
 
 ```pascal
-	with Cases
-		with Case1
-			drop Case1 if not y;
+	for cases
+		for true
+			drop true if not y;
 			...
-			drop Cases;
+			drop cases;
 		end;
 
-		...
+		for false
+			...
+		end;
 	end;
 ```
 
 ### If...Else-If...Else Statement
 
 ```pascal
-	with Cases
-		with Case1
-			drop Case1 if not y1;
+	for cases
+		for case1
+			drop case1 if not y1;
 			...
-			drop Cases;
+			drop cases;
 		end;
 
-		with Case2
-			drop Case2 if not y2;
+		for case2
+			drop case2 if not y2;
 			...
-			drop Cases;
+			drop cases;
 		end;
 
-		with Case3
-			drop Case3 if not y3;
+		for case3
+			drop case3 if not y3;
 			...
-			drop Cases;
+			drop cases;
 		end;
 
-		...
+		for other
+			...
+		end;
 	end;
 ```
 
 ### While Statement
 
 ```Pascal
-	with Loop
-		drop Loop if not y;
+	for loop
+		drop loop if not y;
 		...
-		lift Loop;
+		lift loop;
 	end;
 ```
 
 ### Break Statement (While)
 
 ```pascal
-	with Loop
-		drop Loop if not y1;
+	with loop
+		drop loop if not y1;
 		...
-		drop Loop if not y2;
+		drop loop if not y2;
 		...
-		lift Loop;
+		lift loop;
 	end;
 ```
 
 ### Continue Statement (While)
 
 ```pascal
-	with Loop
-		drop Loop if not y1;
+	for loop
+		drop loop if not y1;
 		...
-		lift Loop if not y2;
+		lift loop if not y2;
 		...
-		lift Loop;
+		lift loop;
 	end;
 ```
 
 ### Do...While Statement
 
 ```pascal
-	with Loop
+	for loop
 		...
-		lift Loop if y;
+		lift loop if y;
 	end;
 ```
 
@@ -480,12 +484,16 @@ L2:
 ```pascal
 	i := 0;
 	
-	with Loop
+	for loop
+		for cond
+			drop loop if not (i < A);
+		end;
+		
 		...
 
-		with Step
+		for step
 			i := i + 1;
-			drop Loop if not (i < A);
+			lift loop;
 		end;
 	end;	
 ```
