@@ -15,13 +15,19 @@ Tags: #Assembly
 
 ```asm
 	mov    y(%rip), %rax
-	test   %ax, %rax
+	test   %rax, %rax
 	je     .L1
 	
 	mov    $1, a(%rip)
 .L1:
 ```
 
+```pseudo
+L1:
+	goto L2 if not y;
+	...
+L2:
+```
 ## If...Else Statement
 
 ```c
@@ -45,6 +51,15 @@ Tags: #Assembly
 .L2:	
 ```
 
+```pseudo
+L1:
+	goto L2 if not y;
+	...
+	goto L3;
+L2:
+	...
+L3:
+```
 ## If...Else-If...Else Statement
 
 ```c
@@ -88,6 +103,23 @@ Tags: #Assembly
 .L2:
 ```
 
+```pseudo
+L1:
+	goto L2 if not y1;
+	...
+	goto L5;
+L2:
+	goto L3 if not y2;
+	...
+	goto L5;
+L3:
+	goto L4 if not y3;
+	...
+	goto L5;
+L4:
+	...
+L5:
+```
 ## While Statement
 
 ```c
@@ -106,6 +138,15 @@ Tags: #Assembly
 	jne     .L2
 ```
 
+```pseudo
+L1:
+	goto L3;
+L2:
+	...
+L3:
+	goto L2 if y;
+L4:
+```
 ## Break Statement (While)
 
 ```c
@@ -127,13 +168,24 @@ Tags: #Assembly
 	
 	mov     $1, b(%rip)
 .L1:
-	mov     y(%rip), %rax
+	mov     y1(%rip), %rax
 	test    %rax, %rax
 	jne     .L3
 .L2:
 
 ```
 
+```pseudo
+L1:
+	goto L3;
+L2:
+	...
+	goto L4 if y2;
+	...
+L3:
+	goto L2 if y1;
+L4:
+```
 ## Continue Statement (While)
 
 ```c
@@ -161,6 +213,24 @@ Tags: #Assembly
 	test    %rax, %rax
 	jne     .L3
 ```
+
+```pseudo
+L1:
+	goto L4;
+L2:
+	...
+
+	;; if...else
+		goto L3 if not y2;
+		goto L4;
+	L3:
+		...
+	L4:
+	;;
+	
+	goto L2 if y1;
+L5:
+```
 ## Do...While Statement
 
 ```c
@@ -176,4 +246,11 @@ Tags: #Assembly
 	mov     y(%rip), %rax
 	test    %rax, %rax
 	jne     .L1
+```
+
+```pseudo
+L1:
+	...
+	goto L1 if y;
+L2:
 ```
